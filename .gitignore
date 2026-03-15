@@ -1,0 +1,9 @@
+.venv/
+.ultralytics/
+__pycache__/
+*.pyc
+*.pte
+*.ptd
+*.pt
+*.mlpackage
+*_executorch_model/

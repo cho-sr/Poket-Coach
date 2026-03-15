@@ -1,0 +1,13 @@
+torch
+torchvision
+coremltools
+executorch
+numpy
+
+# YOLOX loading/export helpers
+loguru
+tqdm
+tabulate
+thop
+ninja
+opencv-python

@@ -49,13 +49,19 @@ final class CameraService: NSObject {
             }
 
             self.session.addOutput(self.videoOutput)
-
-            if let connection = self.videoOutput.connection(with: .video),
-               connection.isVideoOrientationSupported {
-                connection.videoOrientation = .portrait
-            }
+            self.applyVideoOrientation(.portrait)
 
             self.session.commitConfiguration()
+        }
+    }
+
+    func updateOrientation(_ orientation: UIInterfaceOrientation) {
+        guard let videoOrientation = AVCaptureVideoOrientation(interfaceOrientation: orientation) else {
+            return
+        }
+
+        sessionQueue.async {
+            self.applyVideoOrientation(videoOrientation)
         }
     }
 
@@ -72,6 +78,16 @@ final class CameraService: NSObject {
             self.session.stopRunning()
         }
     }
+
+    private func applyVideoOrientation(_ orientation: AVCaptureVideoOrientation) {
+        if let previewConnection = previewLayer.connection, previewConnection.isVideoOrientationSupported {
+            previewConnection.videoOrientation = orientation
+        }
+
+        if let outputConnection = videoOutput.connection(with: .video), outputConnection.isVideoOrientationSupported {
+            outputConnection.videoOrientation = orientation
+        }
+    }
 }
 
 extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
@@ -83,5 +99,22 @@ extension CameraService: AVCaptureVideoDataOutputSampleBufferDelegate {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
         let timestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
         delegate?.cameraService(self, didOutput: pixelBuffer, timestamp: timestamp)
+    }
+}
+
+private extension AVCaptureVideoOrientation {
+    init?(interfaceOrientation: UIInterfaceOrientation) {
+        switch interfaceOrientation {
+        case .portrait:
+            self = .portrait
+        case .portraitUpsideDown:
+            self = .portraitUpsideDown
+        case .landscapeLeft:
+            self = .landscapeRight
+        case .landscapeRight:
+            self = .landscapeLeft
+        default:
+            return nil
+        }
     }
 }

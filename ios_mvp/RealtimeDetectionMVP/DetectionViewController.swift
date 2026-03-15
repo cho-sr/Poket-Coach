@@ -2,9 +2,15 @@ import AVFoundation
 import UIKit
 
 final class DetectionViewController: UIViewController {
+    private let modelInputSize = 640
     private let cameraService = CameraService()
-    private let preprocessor = FramePreprocessor(inputWidth: 320, inputHeight: 320)
-    private let postProcessor = DetectionPostProcessor(classNames: ["person", "ball"])
+    private lazy var preprocessor = FramePreprocessor(inputWidth: modelInputSize, inputHeight: modelInputSize)
+    private let postProcessor = DetectionPostProcessor(
+        confidenceThreshold: 0.25,
+        classNames: ["person", "ball"],
+        rawModelClassCount: 80,
+        sourceClassMap: [0: 0, 32: 1]
+    )
     private let tracker = SimpleTracker()
     private let overlayView = OverlayView()
     private let inferenceQueue = DispatchQueue(label: "app.detector.inference", qos: .userInitiated)
@@ -38,6 +44,7 @@ final class DetectionViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        updateCameraOrientation()
         cameraService.start()
     }
 
@@ -50,12 +57,29 @@ final class DetectionViewController: UIViewController {
         super.viewDidLayoutSubviews()
         cameraService.previewLayer.frame = view.bounds
         overlayView.frame = view.bounds
+        updateCameraOrientation()
+    }
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: { _ in
+            self.cameraService.previewLayer.frame = self.view.bounds
+            self.overlayView.frame = self.view.bounds
+            self.updateCameraOrientation()
+        })
     }
 
     private func render(_ tracks: [TrackResult]) {
         DispatchQueue.main.async {
             self.overlayView.update(tracks: tracks)
         }
+    }
+
+    private func updateCameraOrientation() {
+        guard let interfaceOrientation = view.window?.windowScene?.interfaceOrientation else {
+            return
+        }
+        cameraService.updateOrientation(interfaceOrientation)
     }
 }
 
@@ -97,7 +121,11 @@ extension DetectionViewController: CameraServiceDelegate {
                     input: framePacket.tensorData,
                     shape: framePacket.inputShape
                 )
-                let detections = self.postProcessor.parse(rawOutput: rawOutput)
+                let detections = self.postProcessor.parse(
+                    rawOutput: rawOutput,
+                    inputWidth: CGFloat(framePacket.inputShape[3]),
+                    inputHeight: CGFloat(framePacket.inputShape[2])
+                )
 
                 self.stateQueue.async {
                     let tracks = self.tracker.update(detections: detections)
