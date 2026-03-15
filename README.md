@@ -3,6 +3,25 @@
 
 스마트폰으로 촬영한 축구 영상을 기반으로 선수와 공을 추적하고, 경기 이벤트 및 활동량을 분석하여 사용자에게 피드백과 하이라이트 영상을 제공하는 캡스톤 프로젝트입니다.
 
+## Current Development Layout
+
+The repository currently has three important development areas:
+
+- `RealtimeDetectionMVP/`
+  - Canonical iOS app project used by Xcode
+  - This is the folder to edit when changing the running iPhone app
+- `ios_mvp/`
+  - Export scripts, model artifacts, setup notes, and MVP documentation
+  - This folder is still used for tooling and docs
+- `ios_mvp/RealtimeDetectionMVP/`
+  - Template / mirror source kept for reference
+  - Not the primary Xcode app source
+
+If you are changing the live iOS app, use:
+
+- `RealtimeDetectionMVP/RealtimeDetectionMVP.xcodeproj`
+- `RealtimeDetectionMVP/RealtimeDetectionMVP/`
+
 ## Overview
 
 아마추어 축구나 조기축구 환경에서는 전문 촬영 장비나 분석 시스템이 부족하여, 자신의 플레이를 객관적으로 기록하고 분석하기 어렵습니다.  
