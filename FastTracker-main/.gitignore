@@ -1,0 +1,23 @@
+.DS_Store
+.idea/
+.vscode/
+
+# Python caches and local build artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Native extensions built locally
+yolox/_C*.so
+yolox/_C*.pyd
+
+# Local datasets and checkpoints
+datasets/
+pretrained/
+weights/
+gt/
+
+# Experiment outputs
+YOLOX_outputs/
