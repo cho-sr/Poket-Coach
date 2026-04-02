@@ -3,6 +3,14 @@
 
 스마트폰으로 촬영한 축구 영상을 기반으로 선수와 공을 추적하고, 경기 이벤트 및 활동량을 분석하여 사용자에게 피드백과 하이라이트 영상을 제공하는 캡스톤 프로젝트입니다.
 
+## Offline Video Tracking Prototype
+
+The offline human and ball tracking prototype created in this iteration now lives in `offline_video_tracking/`.
+
+- Source code: `offline_video_tracking/`
+- Usage guide: `offline_video_tracking/README.md`
+- Quick run script: `offline_video_tracking/run_soccer_data_1.sh`
+
 ## Current Development Layout
 
 The repository currently has three important development areas:
@@ -123,4 +131,3 @@ Smartphone Video
 → Performance Analysis
 → Feedback Generation
 → Results Output
-
